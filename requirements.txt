@@ -1,2 +1,6 @@
 fastapi
 uvicorn
+
+
+#friend := https://tap-allow-to-unlock-surprise.onrender.com/track.html
+# map := https://tap-allow-to-unlock-surprise.onrender.com/map.html
