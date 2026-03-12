@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Location Share</title>
+</head>
+
+<body>
+
+<h2>Getting your location...</h2>
+
+<script>
+
+function sendLocation(position){
+
+let data = {
+latitude: position.coords.latitude,
+longitude: position.coords.longitude
+}
+
+fetch("/location",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(data)
+})
+
+}
+
+navigator.geolocation.getCurrentPosition(sendLocation)
+
+</script>
+
+</body>
+</html>

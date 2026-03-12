@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Create Tracking Link</title>
+</head>
+
+<body>
+
+<h2>Live Location Tracker</h2>
+
+<button onclick="create()">Generate Link</button>
+
+<p id="link"></p>
+
+<script>
+
+function create(){
+
+let link = window.location.origin + "/track.html"
+
+document.getElementById("link").innerHTML = link
+
+}
+
+</script>
+
+</body>
+</html>
