@@ -7,7 +7,7 @@ app = FastAPI()
 
 locations = []
 
-TELEGRAM_TOKEN = "8521809713:AAF..."
+TELEGRAM_TOKEN = "8521809713:AAFAZisC2JzlyeDax_EMBRuo6ebVQXGn4DQ"
 CHAT_ID = "7675394721"
 
 app.add_middleware(
@@ -70,3 +70,4 @@ async def get_locations():
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+
