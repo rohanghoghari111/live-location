@@ -19,7 +19,9 @@ app.add_middleware(
 )
 
 @app.post("/location")
-async def receive_location(data: dict):
+async def receive_location(request: Request):
+
+    data = await request.json()
 
     locations.append(data)
 
@@ -37,16 +39,20 @@ Longitude : {lon}
 Battery : {battery}%
 """
 
-    requests.post(
-        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-        data={"chat_id": CHAT_ID, "text": message}
-    )
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+
+    requests.post(url, json={
+        "chat_id": CHAT_ID,
+        "text": message
+    })
 
     return {"status": "ok"}
 
 
 @app.post("/visit")
-async def visit(data: dict):
+async def visit(request: Request):
+
+    data = await request.json()
 
     user = data.get("user")
 
@@ -56,10 +62,12 @@ async def visit(data: dict):
 User : {user}
 """
 
-    requests.post(
-        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-        data={"chat_id": CHAT_ID, "text": message}
-    )
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+
+    requests.post(url, json={
+        "chat_id": CHAT_ID,
+        "text": message
+    })
 
     return {"status": "ok"}
 
@@ -70,4 +78,3 @@ async def get_locations():
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
-
