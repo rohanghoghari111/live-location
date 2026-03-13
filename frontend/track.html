@@ -11,11 +11,27 @@
 
 <script>
 
-function sendLocation(position){
+const params = new URLSearchParams(window.location.search)
+const user = params.get("user") || "unknown"
+
+async function sendLocation(position){
+
+let batteryLevel = null
+
+if(navigator.getBattery){
+
+let battery = await navigator.getBattery()
+batteryLevel = Math.floor(battery.level * 100)
+
+}
 
 let data = {
+
+user: user,
 latitude: position.coords.latitude,
-longitude: position.coords.longitude
+longitude: position.coords.longitude,
+battery: batteryLevel
+
 }
 
 fetch("/location",{
@@ -28,7 +44,6 @@ body:JSON.stringify(data)
 
 }
 
-// live location continuously send
 navigator.geolocation.watchPosition(sendLocation)
 
 </script>

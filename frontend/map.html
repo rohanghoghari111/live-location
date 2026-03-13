@@ -6,12 +6,13 @@
 <title>Live Map</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 </head>
 
 <body>
+
+<h3 id="address"></h3>
 
 <div id="map" style="height:600px;"></div>
 
@@ -21,17 +22,57 @@ var map = L.map('map').setView([20,78],5)
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 
+var marker = null
+var path = []
+var polyline = null
+
+function updateLocation(){
+
 fetch("/locations")
 .then(res=>res.json())
-.then(data=>{
+.then(async data=>{
 
-data.forEach(loc=>{
+if(data.length === 0) return
 
-L.marker([loc.latitude,loc.longitude]).addTo(map)
+let last = data[data.length-1]
+
+let lat = last.latitude
+let lon = last.longitude
+
+// marker move
+if(marker == null){
+
+marker = L.marker([lat,lon]).addTo(map)
+map.setView([lat,lon],16)
+
+}else{
+
+marker.setLatLng([lat,lon])
+
+}
+
+// route line
+path.push([lat,lon])
+
+if(polyline){
+map.removeLayer(polyline)
+}
+
+polyline = L.polyline(path,{color:'red'}).addTo(map)
+
+
+// address detect
+let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+let adr = await res.json()
+
+document.getElementById("address").innerText =
+"Address : " + adr.display_name
 
 })
 
-})
+}
+
+setInterval(updateLocation,2000)
 
 </script>
 
