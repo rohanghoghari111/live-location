@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+requests
 
 
 #friend := https://tap-allow-to-unlock-surprise.onrender.com/track.html
