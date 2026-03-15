@@ -65,9 +65,11 @@ User : {user}
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
     requests.post(url, json={
-    "chat_id": CHAT_ID,
-    "text": message 
+        "chat_id": CHAT_ID,
+        "text": message
     })
+
+    return {"status": "ok"}
 
 @app.get("/locations")
 async def get_locations():

