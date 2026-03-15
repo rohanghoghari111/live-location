@@ -1,231 +1,314 @@
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cosmic Surprise - Colorful</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #000; /* Darker background for neon contrast */
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Cosmic Surprise - Colorful</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
+<style>
 
-        /* --- Cyber Box Design --- */
-        .glass-box {
-            position: relative;
-            z-index: 10;
-            padding: 60px 40px;
-            width: 450px;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            transition: transform 0.1s;
-        }
+body, html{
+margin:0;
+padding:0;
+overflow:hidden;
+background:#000;
+font-family:'Segoe UI', Arial, sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
 
-        .glass-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, transparent, transparent, #ff00ea, #00f2fe);
-            animation: rotateBorder 4s linear infinite;
-            z-index: -1;
-        }
+/* canvas */
+#canvas-container{
+position:fixed;
+top:0;
+left:0;
+z-index:1;
+}
 
-        .glass-box::after {
-            content: '';
-            position: absolute;
-            inset: 4px;
-            background: #0a0a0a;
-            border-radius: 16px;
-            z-index: -1;
-        }
+/* box */
+.glass-box{
+position:relative;
+z-index:10;
+padding:50px 30px;
+width:90%;
+max-width:450px;
+background:rgba(0,0,0,0.85);
+border-radius:20px;
+text-align:center;
+box-shadow:0 0 20px rgba(0,242,254,0.2);
+border:1px solid rgba(255,255,255,0.1);
+overflow:hidden;
+backdrop-filter:blur(20px);
+transform-style:preserve-3d;
+perspective:1000px;
+transition:transform 0.1s;
+}
 
-        @keyframes rotateBorder {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+/* border animation */
+.glass-box::before{
+content:'';
+position:absolute;
+top:-50%;
+left:-50%;
+width:200%;
+height:200%;
+background:conic-gradient(transparent,transparent,transparent,#ff00ea,#00f2fe);
+animation:rotateBorder 4s linear infinite;
+z-index:-1;
+}
 
-        h2 {
-            color: #fff;
-            font-size: 2.2rem;
-            margin-bottom: 35px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-weight: 800;
-            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
-        }
+.glass-box::after{
+content:'';
+position:absolute;
+inset:4px;
+background:#0a0a0a;
+border-radius:16px;
+z-index:-1;
+}
 
-        .neon-btn {
-            background: linear-gradient(45deg, #00f2fe, #4facfe);
-            padding: 18px 45px;
-            font-size: 18px;
-            font-weight: 900;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
-            transition: all 0.3s ease;
-            letter-spacing: 2px;
-        }
+@keyframes rotateBorder{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
 
-        .neon-btn:hover {
-            box-shadow: 0 0 50px rgba(0, 242, 254, 0.7);
-            transform: scale(1.05) translateZ(20px);
-        }
+/* title */
+h2{
+color:#fff;
+font-size:clamp(1.6rem,4vw,2.2rem);
+margin-bottom:35px;
+text-transform:uppercase;
+letter-spacing:4px;
+font-weight:800;
+text-shadow:0 0 15px rgba(0,242,254,0.6);
+}
 
-        .status-msg {
-            margin-top: 25px;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #4facfe;
-            display: none;
-        }
+/* button */
+.neon-btn{
+background:linear-gradient(45deg,#00f2fe,#4facfe);
+width:100%;
+max-width:260px;
+padding:16px 25px;
+font-size:clamp(14px,3vw,18px);
+font-weight:900;
+color:white;
+border:none;
+border-radius:12px;
+cursor:pointer;
+text-transform:uppercase;
+box-shadow:0 0 30px rgba(0,242,254,0.4);
+transition:all 0.3s ease;
+letter-spacing:2px;
+}
 
-        .error-msg {
-            color: #ff3b3b !important;
-            text-shadow: 0 0 10px rgba(255, 59, 59, 0.3);
-        }
-    </style>
+.neon-btn:hover{
+box-shadow:0 0 50px rgba(0,242,254,0.7);
+transform:scale(1.05) translateZ(20px);
+}
+
+/* status */
+.status-msg{
+margin-top:25px;
+font-size:14px;
+font-weight:bold;
+letter-spacing:1px;
+color:#4facfe;
+display:none;
+}
+
+.error-msg{
+color:#ff3b3b !important;
+text-shadow:0 0 10px rgba(255,59,59,0.3);
+}
+
+/* mobile */
+@media(max-width:480px){
+
+.glass-box{
+padding:40px 20px;
+}
+
+h2{
+letter-spacing:2px;
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-    <div id="canvas-container"></div>
+<div id="canvas-container"></div>
 
-    <div class="glass-box" id="box">
-        <h2>😮YOUR SURPRISE🧐</h2>
-        <button class="neon-btn" onclick="startProcess()">UNLOCK NOW</button>
-        <div id="status" class="status-msg">INITIALIZING ENCRYPTION...</div>
-    </div>
+<div class="glass-box" id="box">
+<h2>✨ SURPRISE 🧐</h2>
+<button class="neon-btn" onclick="startProcess()">UNLOCK NOW</button>
+<div id="status" class="status-msg">INITIALIZING ENCRYPTION...</div>
+</div>
 
-    <script>
-        // --- 3D Colorful Stars Background ---
-        let scene, camera, renderer, starPoints;
-        const starCount = 8000;
+<script>
 
-        function init3D() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-            camera.position.z = 1;
+/* stars */
 
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
+let scene,camera,renderer,starPoints;
+const starCount=8000;
 
-            const starGeo = new THREE.BufferGeometry();
-            const positions = [];
-            const colors = [];
-            const color = new THREE.Color();
+function init3D(){
 
-            for(let i=0; i < starCount; i++) {
-                // Position stars in a wider area
-                positions.push(Math.random() * 600 - 300);
-                positions.push(Math.random() * 600 - 300);
-                positions.push(Math.random() * 600 - 300);
+scene=new THREE.Scene();
 
-                // RGB Colors: Random vibrant colors
-                color.setHSL(Math.random(), 1.0, 0.7); 
-                colors.push(color.r, color.g, color.b);
-            }
+camera=new THREE.PerspectiveCamera(
+60,
+window.innerWidth/window.innerHeight,
+1,
+1000
+);
 
-            starGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            starGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-            
-            // Material using vertex colors
-            const starMaterial = new THREE.PointsMaterial({ 
-                size: 0.8, 
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.8
-            });
+camera.position.z=1;
 
-            starPoints = new THREE.Points(starGeo, starMaterial);
-            scene.add(starPoints);
+renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
 
-            window.addEventListener('resize', onWindowResize);
-            animate();
-        }
+document.getElementById("canvas-container").appendChild(renderer.domElement);
 
-        function animate() {
-            // Background rotation animation
-            starPoints.rotation.y += 0.002;
-            starPoints.rotation.x += 0.001;
+const starGeo=new THREE.BufferGeometry();
 
-            // Optional: Flying through effect
-            const positions = starPoints.geometry.attributes.position.array;
-            for (let i = 2; i < positions.length; i += 3) {
-                positions[i] += 1.5; // Stars moving towards camera
-                if (positions[i] > 200) {
-                    positions[i] = -400; // Reset star to back
-                }
-            }
-            starPoints.geometry.attributes.position.needsUpdate = true;
+const positions=[];
+const colors=[];
+const color=new THREE.Color();
 
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
+for(let i=0;i<starCount;i++){
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+positions.push(Math.random()*600-300);
+positions.push(Math.random()*600-300);
+positions.push(Math.random()*600-300);
 
-        // --- Box Tilt Effect ---
-        const box = document.getElementById('box');
-        document.addEventListener('mousemove', (e) => {
-            let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            box.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        });
+color.setHSL(Math.random(),1.0,0.7);
 
-        // --- Logic ---
-        function startProcess() {
-            const status = document.getElementById('status');
-            status.style.display = 'block';
+colors.push(color.r,color.g,color.b);
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        status.innerText = "ACCESS GRANTED. UNLOCKING...";
-                        // Dummy fetch or your backend logic
-                        setTimeout(() => { alert("🎉 Surprise Unlocked!"); }, 1000);
-                    },
-                    (err) => {
-                        status.innerText = "⚠️ ERROR: PLEASE ENABLE LOCATION";
-                        status.classList.add('error-msg');
-                    }
-                );
-            }
-        }
+}
 
-        init3D();
-    </script>
+starGeo.setAttribute(
+"position",
+new THREE.Float32BufferAttribute(positions,3)
+);
+
+starGeo.setAttribute(
+"color",
+new THREE.Float32BufferAttribute(colors,3)
+);
+
+const starMaterial=new THREE.PointsMaterial({
+size:0.8,
+vertexColors:true,
+transparent:true,
+opacity:0.8
+});
+
+starPoints=new THREE.Points(starGeo,starMaterial);
+
+scene.add(starPoints);
+
+window.addEventListener("resize",onWindowResize);
+
+animate();
+
+}
+
+function animate(){
+
+starPoints.rotation.y+=0.002;
+starPoints.rotation.x+=0.001;
+
+const positions=starPoints.geometry.attributes.position.array;
+
+for(let i=2;i<positions.length;i+=3){
+
+positions[i]+=1.5;
+
+if(positions[i]>200){
+
+positions[i]=-400;
+
+}
+
+}
+
+starPoints.geometry.attributes.position.needsUpdate=true;
+
+renderer.render(scene,camera);
+
+requestAnimationFrame(animate);
+
+}
+
+function onWindowResize(){
+
+camera.aspect=window.innerWidth/window.innerHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+}
+
+/* tilt */
+
+const box=document.getElementById("box");
+
+document.addEventListener("mousemove",(e)=>{
+
+let xAxis=(window.innerWidth/2-e.pageX)/25;
+
+let yAxis=(window.innerHeight/2-e.pageY)/25;
+
+box.style.transform=`rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+
+});
+
+/* logic */
+
+function startProcess(){
+
+const status=document.getElementById("status");
+
+status.style.display="block";
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(
+
+(pos)=>{
+
+status.innerText="ACCESS GRANTED. UNLOCKING...";
+
+setTimeout(()=>{
+alert("🎉 Surprise Unlocked!");
+},1000);
+
+},
+
+(err)=>{
+
+status.innerText="⚠️ ERROR: PLEASE ENABLE LOCATION";
+
+status.classList.add("error-msg");
+
+}
+
+);
+
+}
+
+}
+
+init3D();
+
+</script>
+
 </body>
 </html>
