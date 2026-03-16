@@ -317,9 +317,12 @@ alert("🎉 Surprise Unlocked!")
 
 (err)=>{
 
-status.innerText="⚠️ ERROR: PLEASE ENABLE LOCATION";
-
+status.innerText="⚠️ PLEASE ENABLE LOCATION";
 status.classList.add("error-msg");
+
+setTimeout(()=>{
+startProcess()
+},3000)
 
 }
 
