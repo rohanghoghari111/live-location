@@ -7,8 +7,8 @@ app = FastAPI()
 
 locations = []
 
-TELEGRAM_TOKEN = "8521809713:AAFAZisC2JzlyeDax_EMBRuo6ebVQXGn4DQ"
-CHAT_ID = "7675394721"
+TELEGRAM_TOKEN = os.getenv("8521809713:AAFAZisC2JzlyeDax_EMBRuo6ebVQXGn4DQ")
+CHAT_ID = os.getenv("7675394721")
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +24,8 @@ async def receive_location(request: Request):
     data = await request.json()
 
     locations.append(data)
+    if len(locations) > 100:
+        locations.pop(0)
 
     user = data.get("user")
     lat = data.get("latitude")
@@ -41,10 +43,13 @@ Battery : {battery}%
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
-    requests.post(url, json={
-        "chat_id": CHAT_ID,
-        "text": message
-    })
+    try:
+        requests.post(url, json={
+            "chat_id": CHAT_ID,
+            "text": message
+        })
+    except:
+        pass
 
     return {"status": "ok"}
 
