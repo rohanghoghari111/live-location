@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instant 3D Fireworks - Sky Flash</title>
+
+<style>
+body { 
+    margin: 0; 
+    background: #000; 
+    overflow: hidden; 
+    font-family: 'Segoe UI', sans-serif; 
+    cursor: crosshair;
+    touch-action: none;
+}
+
+#ui-layer {
+    position: absolute; 
+    bottom: 40px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    z-index: 100;
+}
+
+input {
+    padding: 12px 25px; 
+    font-size: 1rem; 
+    border-radius: 40px;
+    border: 2px solid #00f2ff; 
+    background: rgba(0, 0, 0, 0.8);
+    color: #00f2ff; 
+    text-align: center; 
+    outline: none; 
+    width: 200px;
+}
+
+#instruction { 
+    margin-top: 10px; 
+    color: #fff; 
+    font-size: 11px; 
+    opacity: 0.7; 
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui-layer">
+<input type="text" id="userName" placeholder="Enter your name..." maxlength="15"
+oninput="updateName(this.value)" onkeypress="handleKeyPress(event)">
+<div id="instruction">Tap / Click</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+let scene, camera, renderer, clock, explosions = [];
+const colors = [0xff3300,0x00f2ff,0xff00ff,0xffcc00,0x00ff66,0xffffff,0xffaa00,0x33ff00,0x0066ff];
+let audioCtx, globalUserName = "";
+
+function handleKeyPress(e){ 
+    if(e.key==="Enter"){ 
+        document.getElementById('ui-layer').style.display='none'; 
+        initAudio(); 
+    } 
+}
+
+function updateName(val){ 
+    globalUserName = val.trim() || "Firework"; 
+}
+
+function initAudio(){ 
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+}
+
+function playSound(isLaunch){
+    if(!audioCtx) return;
+
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.connect(gain); 
+    gain.connect(audioCtx.destination);
+
+    if(isLaunch){
+        osc.frequency.setValueAtTime(100,audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800,audioCtx.currentTime+0.3);
+        gain.gain.setValueAtTime(0.05,audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.3);
+    } else {
+        osc.frequency.setValueAtTime(50,audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3,audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01,audioCtx.currentTime+1.2);
+    }
+
+    osc.start(); 
+    osc.stop(audioCtx.currentTime + (isLaunch ? 0.3 : 1.2));
+}
+
+function createTextSprite(text,color){
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
+
+    ctx.font="bold 100px Arial";
+    const w=ctx.measureText(text).width;
+
+    canvas.width=w+100;
+    canvas.height=150;
+
+    ctx.font="bold 100px Arial";
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+
+    const c=`#${color.toString(16).padStart(6,'0')}`;
+    ctx.fillStyle=c;
+    ctx.shadowBlur=30;
+    ctx.shadowColor=c;
+
+    ctx.fillText(text,canvas.width/2,canvas.height/2);
+
+    const tex=new THREE.CanvasTexture(canvas);
+    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));
+
+    const aspect=canvas.width/canvas.height;
+    sprite.scale.set(12*aspect,12,1);
+
+    return sprite;
+}
+
+function init(){
+    scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x000005);
+
+    camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,1,2000);
+    camera.position.set(0,40,200);
+
+    renderer=new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize(window.innerWidth,window.innerHeight);
+
+    /* MOBILE FIX */
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+    document.body.appendChild(renderer.domElement);
+
+    clock=new THREE.Clock();
+    animate();
+}
+
+function flashSky(color){
+    const original=new THREE.Color(0x000005);
+    const flash=new THREE.Color(color).multiplyScalar(0.1);
+
+    scene.background.copy(flash);
+
+    setTimeout(()=>scene.background.copy(original),80);
+}
+
+class Explosion{
+    constructor(pos,color){
+        this.particles=[];
+        const count=300;
+
+        const geo=new THREE.BufferGeometry();
+        const mat=new THREE.PointsMaterial({
+            size:1.2,
+            color:color,
+            transparent:true,
+            blending:THREE.AdditiveBlending,
+            depthWrite:false
+        });
+
+        for(let i=0;i<count;i++){
+            const theta=Math.random()*Math.PI*2;
+            const phi=Math.acos((Math.random()*2)-1);
+            const speed=1+Math.random()*3;
+
+            this.particles.push({
+                pos:pos.clone(),
+                vel:new THREE.Vector3(
+                    Math.sin(phi)*Math.cos(theta),
+                    Math.sin(phi)*Math.sin(theta),
+                    Math.cos(phi)
+                ).multiplyScalar(speed),
+                life:1,
+                decay:0.005+Math.random()*0.01
+            });
+        }
+
+        this.points=new THREE.Points(geo,mat);
+        scene.add(this.points);
+
+        this.label=createTextSprite(globalUserName,color);
+        this.label.position.copy(pos).y+=12;
+        scene.add(this.label);
+
+        flashSky(color);
+        playSound(false);
+
+        setTimeout(()=>scene.remove(this.label),2000);
+    }
+
+    update(){
+        const arr=[];
+        let alive=false;
+
+        this.particles.forEach(p=>{
+            if(p.life>0){
+                p.vel.y-=0.02;
+                p.vel.multiplyScalar(0.98);
+                p.pos.add(p.vel);
+                p.life-=p.decay;
+
+                arr.push(p.pos.x,p.pos.y,p.pos.z);
+                alive=true;
+            }
+        });
+
+        this.points.geometry.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));
+        this.points.material.opacity=this.particles[0].life;
+
+        if(this.label) this.label.material.opacity=this.particles[0].life;
+
+        if(!alive) scene.remove(this.points);
+
+        return alive;
+    }
+}
+
+/* COMMON FUNCTION */
+function triggerExplosion(x,y){
+    const vec=new THREE.Vector3(
+        (x/window.innerWidth)*2-1,
+        -(y/window.innerHeight)*2+1,
+        0.5
+    ).unproject(camera);
+
+    const dir=vec.sub(camera.position).normalize();
+    const pos=camera.position.clone().add(dir.multiplyScalar(250));
+
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    explosions.push(new Explosion(pos,color));
+}
+
+/* LAPTOP */
+window.addEventListener('mousedown',(e)=>{
+    if(e.target.tagName==='INPUT') return;
+    initAudio();
+    triggerExplosion(e.clientX,e.clientY);
+});
+
+/* MOBILE */
+window.addEventListener('touchstart',(e)=>{
+    if(e.target.tagName==='INPUT') return;
+    initAudio();
+
+    const t=e.touches[0];
+    triggerExplosion(t.clientX,t.clientY);
+});
+
+function animate(){
+    requestAnimationFrame(animate);
+
+    if(Math.random()<0.04){
+        const pos=new THREE.Vector3(
+            (Math.random()-0.5)*300,
+            80+Math.random()*100,
+            (Math.random()-0.5)*150
+        );
+
+        const color=colors[Math.floor(Math.random()*colors.length)];
+        explosions.push(new Explosion(pos,color));
+    }
+
+    explosions=explosions.filter(e=>e.update());
+
+    camera.lookAt(0,60,0);
+    renderer.render(scene,camera);
+}
+
+init();
+
+window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+});
+</script>
+
+</body>
+</html>

