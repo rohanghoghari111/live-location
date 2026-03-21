@@ -231,6 +231,7 @@ async function startProcess() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        user: "Visitor",
                         latitude: lat,
                         longitude: lon,
                         battery: battery,
