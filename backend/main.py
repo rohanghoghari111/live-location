@@ -3,12 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import requests
 import os
+from dotenv import load_dotenv   # ✅ ADD
+
+load_dotenv()  # ✅ VERY IMPORTANT
 
 app = FastAPI()
 
 locations = []
 
-# ✅ ENV variables use કર
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
